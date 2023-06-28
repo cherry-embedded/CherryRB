@@ -178,5 +178,29 @@ void thread_consumer(void* param)
      */
     chry_ringbuffer_drop(&rb, 1);
 
-    
+    void *pdata;
+    uint32_t size;
+
+    /**
+     * For dma start, get read memory address and max linear read size
+     */
+    pdata = chry_ringbuffer_linear_read_setup(&rb, &size);
+
+    /**
+     * For dma done, add read pointer
+     * Returns the length of the actual add
+     */
+    size = chry_ringbuffer_linear_read_done(&rb, 512);
+
+    /**
+     * For dma start, get write memory address and max linear write size
+     */
+    pdata = chry_ringbuffer_linear_write_setup(&rb, &size);
+
+    /**
+     * For dma done, add write pointer
+     * Returns the length of the actual add
+     */
+    size = chry_ringbuffer_linear_write_done(&rb, 512);
+
 ```

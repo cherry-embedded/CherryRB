@@ -44,6 +44,11 @@ extern uint32_t chry_ringbuffer_peek(chry_ringbuffer_t *rb, void *data, uint32_t
 extern uint32_t chry_ringbuffer_read(chry_ringbuffer_t *rb, void *data, uint32_t size);
 extern uint32_t chry_ringbuffer_drop(chry_ringbuffer_t *rb, uint32_t size);
 
+extern void *chry_ringbuffer_linear_write_setup(chry_ringbuffer_t *rb, uint32_t *size);
+extern void *chry_ringbuffer_linear_read_setup(chry_ringbuffer_t *rb, uint32_t *size);
+extern uint32_t chry_ringbuffer_linear_write_done(chry_ringbuffer_t *rb, uint32_t size);
+extern uint32_t chry_ringbuffer_linear_read_done(chry_ringbuffer_t *rb, uint32_t size);
+
 #ifdef __cplusplus
 }
 #endif

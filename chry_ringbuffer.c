@@ -378,3 +378,97 @@ uint32_t chry_ringbuffer_drop(chry_ringbuffer_t *rb, uint32_t size)
     rb->out += size;
     return size;
 }
+
+/*****************************************************************************
+* @brief        linear write setup, get write pointer and max linear size.
+*               
+* @param[in]    rb          ringbuffer instance
+* @param[in]    size        pointer to store max linear size in byte
+* 
+* @retval void*             write memory pointer
+*****************************************************************************/
+void *chry_ringbuffer_linear_write_setup(chry_ringbuffer_t *rb, uint32_t *size)
+{
+    uint32_t unused;
+    uint32_t offset;
+    uint32_t remain;
+
+    unused = (rb->mask + 1) - (rb->in - rb->out);
+
+    offset = rb->in & rb->mask;
+
+    remain = rb->mask + 1 - offset;
+    remain = remain > unused ? unused : remain;
+
+    if (remain) {
+        *size = remain;
+        return ((uint8_t *)(rb->pool)) + offset;
+    } else {
+        *size = unused - remain;
+        return rb->pool;
+    }
+}
+
+/*****************************************************************************
+* @brief        linear read setup, get read pointer and max linear size.
+* 
+* @param[in]    rb          ringbuffer instance
+* @param[in]    size        pointer to store max linear size in byte
+* 
+* @retval void*             
+*****************************************************************************/
+void *chry_ringbuffer_linear_read_setup(chry_ringbuffer_t *rb, uint32_t *size)
+{
+    uint32_t used;
+    uint32_t offset;
+    uint32_t remain;
+
+    used = rb->in - rb->out;
+
+    offset = rb->out & rb->mask;
+
+    remain = rb->mask + 1 - offset;
+    remain = remain > used ? used : remain;
+
+    if (remain) {
+        *size = remain;
+        return ((uint8_t *)(rb->pool)) + offset;
+    } else {
+        *size = used - remain;
+        return rb->pool;
+    }
+}
+
+/*****************************************************************************
+* @brief        linear write done, add write pointer only
+* 
+* @param[in]    rb          ringbuffer instance
+* @param[in]    size        write size in byte
+* 
+* @retval uint32_t          actual write size in byte
+*****************************************************************************/
+uint32_t chry_ringbuffer_linear_write_done(chry_ringbuffer_t *rb, uint32_t size)
+{
+    uint32_t unused;
+
+    unused = (rb->mask + 1) - (rb->in - rb->out);
+    if (size > unused) {
+        size = unused;
+    }
+    rb->in += size;
+
+    return size;
+}
+
+/*****************************************************************************
+* @brief        linear read done, add read pointer only
+* 
+* @param[in]    rb          ringbuffer instance
+* @param[in]    size        read size in byte
+* 
+* @retval uint32_t          actual read size in byte
+*****************************************************************************/
+uint32_t chry_ringbuffer_linear_read_done(chry_ringbuffer_t *rb, uint32_t size)
+{
+    return chry_ringbuffer_drop(rb, size);
+}

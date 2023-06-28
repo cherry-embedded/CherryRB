@@ -172,5 +172,29 @@ void thread_consumer(void* param)
      */
     chry_ringbuffer_drop(&rb, 1);
 
-    
+    void *pdata;
+    uint32_t size;
+
+    /**
+     * 用于启动DMA，获取读取起始内存地址和最大线性可读取长度
+     */
+    pdata = chry_ringbuffer_linear_read_setup(&rb, &size);
+
+    /**
+     * 用于DMA完成，增加读指针
+     * 返回实际增加长度
+     */
+    size = chry_ringbuffer_linear_read_done(&rb, 512);
+
+    /**
+     * 用于启动DMA，获取写入起始内存地址和最大线性可写入长度
+     */
+    pdata = chry_ringbuffer_linear_write_setup(&rb, &size);
+
+    /**
+     * 用于DMA完成，增加写指针
+     * 返回实际增加长度
+     */
+    size = chry_ringbuffer_linear_write_done(&rb, 512);
+
 ```
